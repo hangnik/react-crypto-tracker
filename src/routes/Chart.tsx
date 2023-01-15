@@ -21,67 +21,83 @@ interface IHistorical {
 
 function Chart({ coinId }: ChartProps) {
   const isDark = useRecoilValue(isDarkAtom);
-  const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
-    fectchCoinHistory(coinId)
+  const { isLoading, data } = useQuery<IHistorical[]>(
+    ["ohlcv", coinId],
+    () => fectchCoinHistory(coinId),
+    { refetchInterval: 5000 }
   );
+  const exceptData = data ?? [];
+  /* let chartData = null;
+  if (Array.isArray(data)) {
+    chartData = exceptData?.map((i) => {
+      return {
+        x: i.time_close,
+        y: [i.open, i.high, i.low, i.close] ?? [],
+      };
+    });
+  } */
+
   return (
     <div>
       {isLoading ? (
         "Loaidng chart..."
       ) : (
-        <ApexChart
-          type="line"
-          series={[
-            {
-              name: "Prices",
-              data: data?.map((price) => parseInt(price.close)) as number[],
-            },
-          ]}
-          options={{
-            theme: {
-              mode: isDark ? "dark" : "light",
-            },
-            chart: {
-              height: 300,
-              width: 500,
-              toolbar: {
-                show: false,
+        <div>
+          <ApexChart
+            type="line"
+            series={[
+              {
+                name: "Prices",
+                data: exceptData?.map((price) => parseInt(price.close)),
               },
-              background: "transparent",
-            },
-            grid: { show: false },
-            stroke: {
-              curve: "smooth",
-              width: 3,
-            },
-            yaxis: { show: false },
-            xaxis: {
-              labels: {
-                show: false,
+            ]}
+            options={{
+              theme: {
+                mode: isDark ? "dark" : "light",
               },
-              type: "datetime",
-              categories: data?.map((price) =>
-                new Date(price.time_close * 1000).toISOString()
-              ),
-              axisTicks: {
-                show: false,
+              chart: {
+                height: 300,
+                width: 480,
+                toolbar: {
+                  show: false,
+                },
+                background: "transparent",
               },
-            },
-            fill: {
-              type: "gradient",
-              gradient: {
-                gradientToColors: ["green"],
-                stops: [0, 100],
+              grid: { show: false },
+              stroke: {
+                curve: "smooth",
+                width: 3,
               },
-            },
-            colors: ["yellow"],
-            tooltip: {
-              y: {
-                formatter: (value) => `$${value}`,
+              yaxis: { show: false },
+              xaxis: {
+                labels: {
+                  show: false,
+                },
+                type: "datetime",
+                categories: data?.map((price) =>
+                  new Date(price.time_close * 1000).toISOString()
+                ),
+                axisTicks: {
+                  show: false,
+                },
               },
-            },
-          }}
-        />
+              colors: ["#e74c3c"],
+              tooltip: {
+                y: {
+                  formatter: (value) => `$${value}`,
+                },
+              },
+            }}
+          />
+          {/* <ApexChart
+            type="candlestick"
+            series={[
+              {
+                data: chartData,
+              },
+            ]}
+          /> */}
+        </div>
       )}
     </div>
   );

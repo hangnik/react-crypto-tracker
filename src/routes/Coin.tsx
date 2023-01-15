@@ -12,6 +12,7 @@ import Price from "./Price";
 import { useQuery } from "react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
 import { Helmet } from "react-helmet";
+import { BiLeftArrowAlt } from "react-icons/bi";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -20,15 +21,27 @@ const Container = styled.div`
 `;
 
 const Header = styled.header`
-  height: 10vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height: 8rem;
+  display: grid;
+  grid-template-columns: 1fr 6fr;
+  place-items: center start;
 `;
 
 const Title = styled.h1`
-  font-size: 48px;
+  font-size: 38px;
+  font-weight: bold;
   color: ${(props) => props.theme.accentColor};
+`;
+
+const BackBtn = styled(Link)`
+  background-color: transparent;
+  border: none;
+  margin-top: 6px;
+  color: ${(props) => props.theme.accentColor};
+  svg {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 `;
 
 const Loader = styled.span`
@@ -38,24 +51,27 @@ const Loader = styled.span`
 
 const Overview = styled.div`
   display: flex;
-  justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 10px 20px;
+  justify-content: space-around;
+  background-color: ${(props) => props.theme.cardBgColor};
+  padding: 15px 20px;
   border-radius: 10px;
 `;
+
 const OverviewItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   span:first-child {
-    font-size: 10px;
-    font-weight: 400;
+    color: ${(props) => props.theme.titleColor};
+    font-size: 12px;
+    font-weight: 600;
     text-transform: uppercase;
     margin-bottom: 5px;
   }
 `;
 const Description = styled.p`
-  margin: 20px 0px;
+  margin: 20px 10px;
+  line-height: 1.4em;
 `;
 
 const Tabs = styled.div`
@@ -68,13 +84,13 @@ const Tabs = styled.div`
 const Tab = styled.span<{ isActive: boolean }>`
   text-align: center;
   text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 400;
-  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 15px;
+  font-weight: 600;
+  background-color: ${(props) => props.theme.cardBgColor};
   padding: 7px 0px;
   border-radius: 10px;
   color: ${(props) =>
-    props.isActive ? props.theme.accentColor : props.theme.textColor};
+    props.isActive ? props.theme.accentColor : props.theme.titleColor};
   a {
     display: block;
   }
@@ -111,7 +127,7 @@ interface InfoData {
   last_data_at: string;
 }
 
-interface PriceData {
+export interface PriceData {
   id: string;
   name: string;
   symbol: string;
@@ -145,8 +161,6 @@ interface PriceData {
   };
 }
 
-interface ICoinProps {}
-
 function Coin() {
   const { coinId } = useParams<CoinParams>();
   const { state } = useLocation<RouteState>();
@@ -160,26 +174,9 @@ function Coin() {
     ["tickers", coinId],
     () => fetchCoinTickers(coinId),
     {
-      refetchInterval: 5000,
+      refetchInterval: 10000,
     }
   );
-  /* const [loading, setLoading] = useState(true);
-    const [info, setInfo] = useState<InfoData>();
-    const [priceInfo, setPriceInfo] = useState<PriceData>();
-    useEffect(() => {
-        (async () => {
-            const infoData = await (
-                await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
-            console.log(infoData);
-                const priceData = await (
-                await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json()
-            )
-            console.log(priceData);
-            setInfo(infoData);
-            setPriceInfo(priceData);
-            setLoading(false);
-        })();
-    }, [coinId]); */
   const loading = infoLoading || tickersLoading;
   return (
     <Container>
@@ -189,36 +186,39 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <BackBtn to="/">
+          <BiLeftArrowAlt />
+        </BackBtn>
         <Title>
           {state?.name ? state.name : loading ? "Loading.." : infoData?.name}
         </Title>
       </Header>
       {loading ? (
-        <Loader>"Loading..."</Loader>
+        <Loader>Loading...</Loader>
       ) : (
         <>
           <Overview>
             <OverviewItem>
-              <span>Rank:</span>
+              <span>Rank</span>
               <span>{infoData?.rank}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Symbol:</span>
-              <span>${infoData?.symbol}</span>
+              <span>Symbol</span>
+              <span>{infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Price:</span>
-              <span>{tickersData?.quotes.USD.price.toFixed(3)}</span>
+              <span>Price</span>
+              <span>${tickersData?.quotes.USD.price.toFixed(3)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
           <Overview>
             <OverviewItem>
-              <span>Total Suply:</span>
+              <span>Total Supply</span>
               <span>{tickersData?.total_supply}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Max Supply:</span>
+              <span>Max Supply</span>
               <span>{tickersData?.max_supply}</span>
             </OverviewItem>
           </Overview>
@@ -232,7 +232,7 @@ function Coin() {
           </Tabs>
           <Switch>
             <Route path={`/${coinId}/price`}>
-              <Price />
+              <Price coinId={coinId} />
             </Route>
             <Route path={`/${coinId}/chart`}>
               <Chart coinId={coinId} />

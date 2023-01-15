@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/react-masterclass-cryptoTracker/static/js/main.293afbbc.js",
-    "index.html": "/react-masterclass-cryptoTracker/index.html",
-    "main.293afbbc.js.map": "/react-masterclass-cryptoTracker/static/js/main.293afbbc.js.map"
+    "main.js": "/react-crypto-tracker/static/js/main.b88c541a.js",
+    "index.html": "/react-crypto-tracker/index.html",
+    "main.b88c541a.js.map": "/react-crypto-tracker/static/js/main.b88c541a.js.map"
   },
   "entrypoints": [
-    "static/js/main.293afbbc.js"
+    "static/js/main.b88c541a.js"
   ]
 }

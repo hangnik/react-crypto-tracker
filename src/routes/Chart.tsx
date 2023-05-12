@@ -26,16 +26,11 @@ function Chart({ coinId }: ChartProps) {
     () => fectchCoinHistory(coinId),
     { refetchInterval: 5000 }
   );
-  const exceptData = data ?? [];
-  /* let chartData = null;
-  if (Array.isArray(data)) {
-    chartData = exceptData?.map((i) => {
-      return {
-        x: i.time_close,
-        y: [i.open, i.high, i.low, i.close] ?? [],
-      };
-    });
-  } */
+
+  let exceptData = data ?? [];
+  if ("error" in exceptData) {
+    exceptData = [];
+  }
 
   return (
     <div>
@@ -56,8 +51,8 @@ function Chart({ coinId }: ChartProps) {
                 mode: isDark ? "dark" : "light",
               },
               chart: {
-                height: 300,
-                width: 480,
+                height: 500,
+                width: 300,
                 toolbar: {
                   show: false,
                 },
@@ -66,7 +61,7 @@ function Chart({ coinId }: ChartProps) {
               grid: { show: false },
               stroke: {
                 curve: "smooth",
-                width: 3,
+                width: 2,
               },
               yaxis: { show: false },
               xaxis: {
@@ -80,6 +75,9 @@ function Chart({ coinId }: ChartProps) {
                 axisTicks: {
                   show: false,
                 },
+                tooltip: {
+                  enabled: false,
+                },
               },
               colors: ["#e74c3c"],
               tooltip: {
@@ -89,14 +87,72 @@ function Chart({ coinId }: ChartProps) {
               },
             }}
           />
-          {/* <ApexChart
+          <ApexChart
             type="candlestick"
             series={[
               {
-                data: chartData,
+                name: "시세",
+                data: exceptData?.map((price) => ({
+                  x: price.time_close * 1000,
+                  y: [price.open, price.high, price.low, price.close],
+                })),
               },
             ]}
-          /> */}
+            width="100%"
+            height="160px"
+            options={{
+              noData: {
+                text: "",
+              },
+              fill: {
+                opacity: 0,
+              },
+              theme: {
+                mode: isDark ? "dark" : "light",
+              },
+              chart: {
+                toolbar: {
+                  show: false,
+                },
+                background: "transparent",
+                fontFamily: '"Pretendard", sans-serif',
+                width: 500,
+                height: 300,
+              },
+              grid: {
+                show: false,
+              },
+              tooltip: {
+                y: {
+                  formatter: (value) => `$${value.toFixed(2)}`,
+                },
+              },
+              xaxis: {
+                labels: {
+                  show: false,
+                },
+                type: "datetime",
+                categories: exceptData?.map((price) => price.time_close * 1000),
+                axisTicks: {
+                  show: false,
+                },
+                axisBorder: {
+                  show: false,
+                },
+                tooltip: {
+                  enabled: false,
+                },
+              },
+              yaxis: {
+                labels: {
+                  show: false,
+                },
+              },
+              stroke: {
+                width: 2,
+              },
+            }}
+          />
         </div>
       )}
     </div>
